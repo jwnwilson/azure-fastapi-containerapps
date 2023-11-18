@@ -20,13 +20,7 @@ def background_on_message(task):
 
 @app.get("/{word}")
 async def root(word: str, background_task: BackgroundTasks):
-    task_name = None
-
-    # set correct task name based on the way you run the example
-    if not bool(os.getenv('DOCKER')):
-        task_name = "app.worker.celery_worker.test_celery"
-    else:
-        task_name = "app.app.worker.celery_worker.test_celery"
+    task_name = "app.app.worker.celery_worker.test_celery"
 
     task = celery_app.send_task(task_name, args=[word])
     print(task)

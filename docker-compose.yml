@@ -40,6 +40,8 @@ services:
 
   fastapi:
     build: .
+    platform: "linux/amd64"
+    image: fastapi-example
     ports:
       - "8000:8000"
     depends_on:
@@ -50,8 +52,9 @@ services:
     command: "poetry run hypercorn app/app/main:app --bind 0.0.0.0:8000 --reload"
 
   worker:
-    build: .
+    image: fastapi-example
     depends_on:
+      - fastapi
       - rabbitmq
       - redis
     volumes:

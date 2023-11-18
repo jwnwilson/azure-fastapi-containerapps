@@ -32,3 +32,48 @@ Execute the following command: ```poetry install --dev```
 1. Start the FastAPI web application with ```poetry run hypercorn app/main:app --reload```.
 2. Start the celery worker with command ```poetry run celery worker -A app.worker.celery_worker -l info -Q test-queue -c 1```
 3. Navigate to the [http://localhost:8000/docs](http://localhost:8000/docs) and execute test API call. You can monitor the execution of the celery tasks in the console logs or navigate to the flower monitoring app at [http://localhost:5555](http://localhost:5555) (username: user, password: test).
+
+export RESOURCE_GROUP="fastapi-containerapps"
+export LOCATION="northeurope"
+export ENVIRONMENT="env-fastapi-containerapps"
+export API_NAME="fastapi-api"
+export FRONTEND_NAME="fastapi-ui"
+export ACR_NAME="mycontainerregistrynoel"
+
+az group create \
+  --name $RESOURCE_GROUP \
+  --location "$LOCATION"
+
+az acr create \
+  --resource-group $RESOURCE_GROUP \
+  --name $ACR_NAME \
+  --sku Basic \
+  --admin-enabled true
+
+az acr build --registry $ACR_NAME --image $API_NAME .
+
+az containerapp env create \
+  --name $ENVIRONMENT \
+  --resource-group $RESOURCE_GROUP \
+  --location "$LOCATION"
+
+# Setup fastapi container
+az containerapp create \
+  --name $API_NAME \
+  --resource-group $RESOURCE_GROUP \
+  --environment $ENVIRONMENT \
+  --image $ACR_NAME.azurecr.io/$API_NAME \
+  --target-port 80 \
+  --ingress 'external' \
+  --registry-server $ACR_NAME.azurecr.io \
+  --query properties.configuration.ingress.fqdn
+
+# Setup redis container
+az containerapp create \
+  --name redis \
+  --resource-group $RESOURCE_GROUP \
+  --environment $ENVIRONMENT \
+  --image redis \
+  --target-port 6379 \
+  --ingress 'internal' \
+  --query properties.configuration.ingress.fqdn
