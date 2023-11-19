@@ -71,7 +71,8 @@ az acr create \
 ```az containerapp env create \
   --name $ENVIRONMENT \
   --resource-group $RESOURCE_GROUP \
-  --location "$LOCATION"```
+  --location "$LOCATION"
+```
 
 ### Deploy fastapi container
 ```az containerapp create \
@@ -82,7 +83,8 @@ az acr create \
   --target-port 80 \
   --ingress 'external' \
   --registry-server $ACR_NAME.azurecr.io \
-  --query properties.configuration.ingress.fqdn```
+  --query properties.configuration.ingress.fqdn
+```
 
 # Setup redis container
 
@@ -92,7 +94,8 @@ az acr create \
 ```az containerapp service redis create \
   --name myredis \
   --resource-group "$RESOURCE_GROUP" \
-  --environment "$ENVIRONMENT"```
+  --environment "$ENVIRONMENT"
+```
   
 Get redis password from redis config and update image / env var with redis password.
 
@@ -101,7 +104,8 @@ Get redis password from redis config and update image / env var with redis passw
   --name $API_NAME \
   --resource-group $RESOURCE_GROUP \
   --image $ACR_NAME.azurecr.io/$API_NAME:v1 \
-  --bind myredis```
+  --bind myredis
+```
 
 ### Deploy celery container
 
@@ -113,5 +117,6 @@ I was unable to re-use the existing image and set the --command arg successfully
   --environment $ENVIRONMENT \
   --image $ACR_NAME.azurecr.io/$API_NAME:worker_v1 \
   --registry-server $ACR_NAME.azurecr.io \
-  --bind myredis```
+  --bind myredis
+```
   
