@@ -68,14 +68,16 @@ az acr create \
 `az acr build --registry $ACR_NAME --image $API_NAME .`
 
 ### Create container app env
-```az containerapp env create \
+```
+az containerapp env create \
   --name $ENVIRONMENT \
   --resource-group $RESOURCE_GROUP \
   --location "$LOCATION"
 ```
 
 ### Deploy fastapi container
-```az containerapp create \
+```
+az containerapp create \
   --name $API_NAME \
   --resource-group $RESOURCE_GROUP \
   --environment $ENVIRONMENT \
@@ -91,7 +93,8 @@ az acr create \
 ### Deploy fastapi container
 `az provider register --namespace Microsoft.ServiceLinker`
 
-```az containerapp service redis create \
+```
+az containerapp service redis create \
   --name myredis \
   --resource-group "$RESOURCE_GROUP" \
   --environment "$ENVIRONMENT"
@@ -100,7 +103,8 @@ az acr create \
 Get redis password from redis config and update image / env var with redis password.
 
 ### Connect fastapi container to redis container
-```az containerapp update \
+```
+az containerapp update \
   --name $API_NAME \
   --resource-group $RESOURCE_GROUP \
   --image $ACR_NAME.azurecr.io/$API_NAME:v1 \
@@ -111,7 +115,8 @@ Get redis password from redis config and update image / env var with redis passw
 
 I was unable to re-use the existing image and set the --command arg successfully, there isn't an example in the docs or info available on stack overflow so I created a new docker image with the celery.Dockerfile file tagged: "worker_v1"
 
-```az containerapp create \
+```
+az containerapp create \
   --name $WORKER_NAME \
   --resource-group $RESOURCE_GROUP \
   --environment $ENVIRONMENT \
